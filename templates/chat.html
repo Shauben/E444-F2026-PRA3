@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Chatbot</h1>
+</div>
+
+<p>Welcome, {{ name }}!</p>
+
+<div id="messages"></div>
+
+<form id="chat-form">
+    <input id="message-input" type="text" placeholder="Type a message" required>
+    <button type="submit">Send</button>
+</form>
+
+<br>
+
+<form action="{{ url_for('logout') }}" method="POST">
+    <button type="submit">Logout</button>
+</form>
+
+<script>
+    const chatForm = document.getElementById("chat-form");
+    const messageInput = document.getElementById("message-input");
+    const messages = document.getElementById("messages");
+
+    chatForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        messages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+        messages.innerHTML += `<p><strong>Bot:</strong> ${data.reply}</p>`;
+
+        messageInput.value = "";
+    });
+</script>
+{% endblock %}
