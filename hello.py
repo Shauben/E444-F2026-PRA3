@@ -2,14 +2,31 @@ from datetime import datetime
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
+from forms import NameEmailForm
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "ece444-pra3-secret-key"
+
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html", current_time=datetime.utcnow())
+    form = NameEmailForm()
+    name = None
+    email = None
+
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+
+    return render_template(
+        "index.html",
+        form=form,
+        name=name,
+        email=email,
+        current_time=datetime.utcnow()
+    )
 
 @app.route("/user/<name>")
 def user(name):
